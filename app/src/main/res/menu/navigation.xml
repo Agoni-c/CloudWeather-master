@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_weather"
+        android:icon="@mipmap/weather"
+        android:title="@string/title_weather" />
+
+    <item
+        android:id="@+id/navigation_news"
+        android:icon="@mipmap/news"
+        android:title="@string/title_news" />
+
+    <item
+        android:id="@+id/navigation_video"
+        android:icon="@mipmap/video"
+        android:title="@string/title_video" />
+
+</menu>

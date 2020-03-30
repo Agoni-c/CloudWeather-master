@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@mipmap/setting"
+            android:title="设置"/>
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@mipmap/about"
+            android:title="关于我们"/>
+        <item
+            android:id="@+id/nav_clean"
+            android:icon="@mipmap/clean"
+            android:title="清除缓存"/>
+        <item
+            android:id="@+id/nav_png"
+            android:title="天气水印"
+            android:icon="@mipmap/photo"/>
+    </group>
+
+</menu>
