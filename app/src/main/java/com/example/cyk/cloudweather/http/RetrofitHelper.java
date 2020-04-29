@@ -2,7 +2,6 @@ package com.example.cyk.cloudweather.http;
 
 import rx.Observable;
 
-import com.example.cyk.cloudweather.bean.NewsBean;
 import com.example.cyk.cloudweather.bean.TodayBean;
 import com.example.cyk.cloudweather.bean.VideoUrlBean;
 
@@ -27,9 +26,6 @@ public class RetrofitHelper {
         retrofitService = retrofit.create(RetrofitService.class);
     }
 
-    public Observable<NewsBean> getNews(String type, String id, int startPage) {
-        return retrofitService.getNews(type, id, startPage);
-    }
     public Observable<TodayBean> getToday(String category){
         return retrofitService.getToday(category);
     }

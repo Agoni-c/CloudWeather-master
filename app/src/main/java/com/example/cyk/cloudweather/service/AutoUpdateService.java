@@ -53,7 +53,7 @@ public class AutoUpdateService extends Service {
             //有缓存时直接解析天气数据
             Weather weather = WeatherJson.getWeatherResponse(weatherString);
             String weatherId = weather.basic.weatherId;
-            String weatherUrl = "https://api.heweather.net/s6/weather?location="+weatherId+"&key=b3f12f4deb964e7289fa38050148e5b5";
+            String weatherUrl = "https://api.heweather.net/s6/weather?location="+weatherId+"&key=88796e0ed0b045c0aba50fd9c2239a35";
 
             OkHttp.sendRequestOkHttpForGet(weatherUrl, new Callback() {
                 @Override

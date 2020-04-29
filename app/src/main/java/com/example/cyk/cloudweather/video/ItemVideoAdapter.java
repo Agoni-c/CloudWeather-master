@@ -40,17 +40,17 @@ public class ItemVideoAdapter extends RecyclerView.Adapter<ItemVideoAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        TodayContentBean bean=objects.get(position);
+        TodayContentBean bean= objects.get(position);
         holder.videoPlayer.setUp(videoList.get(position),
                 JZVideoPlayerStandard.SCREEN_WINDOW_LIST,
                 bean.getTitle());
-//
-//        Glide.with(context)
-//                .load(bean.getVideo_detail_info().getDetail_video_large_image().getUrl())
-//                .into( holder.videoPlayer.thumbImageView);
-        Picasso.get()
+
+        Glide.with(context)
                 .load(bean.getVideo_detail_info().getDetail_video_large_image().getUrl())
                 .into(holder.videoPlayer.thumbImageView);
+//        Picasso.get()
+//                .load(bean.getVideo_detail_info().getDetail_video_large_image().getUrl())
+//                .into(holder.videoPlayer.thumbImageView);
     }
 
     @Override

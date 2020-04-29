@@ -3,7 +3,6 @@ package com.example.cyk.cloudweather.http;
 import retrofit2.http.Url;
 import rx.Observable;
 
-import com.example.cyk.cloudweather.bean.NewsBean;
 import com.example.cyk.cloudweather.bean.TodayBean;
 import com.example.cyk.cloudweather.bean.VideoUrlBean;
 
@@ -16,10 +15,10 @@ public interface  RetrofitService {
     /*
      * http://c.m.163.com/nc/article/headline/T1348647909107/0-20.html
      * */
-    @GET("nc/article/{type}/{id}/{startPage}-20.html")
-    Observable<NewsBean> getNews(@Path("type") String type,
-                                 @Path("id") String id,
-                                 @Path("startPage") int startPage);
+//    @GET("nc/article/{type}/{id}/{startPage}-20.html")
+//    Observable<NewsBean> getNews(@Path("type") String type,
+//                                 @Path("id") String id,
+//                                 @Path("startPage") int startPage);
 
     /*
      * http://3g.163.com/touch/reconstruct/article/list/BA8E6OEOwangning/0-20.html

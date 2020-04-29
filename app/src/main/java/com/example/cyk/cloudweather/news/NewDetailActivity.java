@@ -72,6 +72,9 @@ public class NewDetailActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //清除网页访问留下的缓存
+        //由于内核缓存是全局的因此这个方法不仅仅针对webview而是针对整个应用程序.
+        wbNews.clearCache(true);
         wbNews.destroy();
     }
 

@@ -6,12 +6,12 @@
         android:id="@+id/share"
         android:icon="@mipmap/ic_share"
         android:title="Share"
-        android:showAsAction="always"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/more"
         android:icon="@mipmap/more"
         android:title="More"
-        android:showAsAction="always"/>
+        app:showAsAction="always"/>
 
 </menu>

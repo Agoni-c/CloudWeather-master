@@ -48,7 +48,7 @@ public class VideoFragment extends Fragment  implements IVideoView {
                 iVideoPresenter.loadVideo();
             }
         });
-        itemVideoAdapter = new ItemVideoAdapter(getActivity());
+        itemVideoAdapter = new ItemVideoAdapter(this.getActivity());
     }
 
     @Override

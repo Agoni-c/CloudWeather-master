@@ -10,17 +10,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
-import com.example.cyk.cloudweather.BaiduLocation;
-import com.example.cyk.cloudweather.WeatherActivity;
+import com.example.cyk.cloudweather.MainActivity;
+import com.example.cyk.cloudweather.baidu.BaiduLocation;
+import com.example.cyk.cloudweather.http.MyCallBack;
+import com.example.cyk.cloudweather.http.MyHttp;
+import com.example.cyk.cloudweather.weather.RingActivity;
+import com.example.cyk.cloudweather.weather.RingReceived;
+import com.example.cyk.cloudweather.weather.WeatherActivity;
 import com.example.cyk.cloudweather.R;
 import com.example.cyk.cloudweather.WidgetProvider;
 import com.example.cyk.cloudweather.db.DBManager;
@@ -28,22 +36,29 @@ import com.example.cyk.cloudweather.gson.Weather;
 import com.example.cyk.cloudweather.json.WeatherJson;
 import com.example.cyk.cloudweather.util.IconUtil;
 
+import org.litepal.util.LogUtil;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * 天气桌面组件
+ */
 public class UpdateService extends Service {
     private static final String TAG = "UpdateService";
     public static final String REFRESH_WIDGET = "REFRESH_WIDGET";
+    private static final String LOCATION_NAME = "Location";
     private static final int UPDATE = 0x123;
     private RemoteViews remoteViews;
 
     BaiduLocation baiduLocation;
-    //定位城市的天气Id和城市名
+    //定位城市名
     public static String locationCountyWeatherName = null;
-//    private Weather weather;
-    private Weather weather = WeatherJson.getWeatherResponse(DBManager.queryInfoByCity(DBManager.queryALLCityName().get(0)));
+    //天气类
+    private Weather weather;
 
     private Handler handler = new Handler() {
 
@@ -53,11 +68,12 @@ public class UpdateService extends Service {
                 case UPDATE:
                     // 更新天气
                     updateTime();
-//                    updateWeather();
+                    updateWeather();
                     break;
             }
         }
     };
+
     // 广播接收者去接收系统每分钟的提示广播，来更新时间
     private BroadcastReceiver mTimePickerBroadcast = new BroadcastReceiver() {
 
@@ -77,23 +93,26 @@ public class UpdateService extends Service {
         super.onCreate();
         remoteViews = new RemoteViews(getApplication().getPackageName(),
                 R.layout.widget_provider);// 实例化RemoteViews
-        // 点击天气图片，进入MainActivity
-        Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
+        //获取数据库中存储的定位城市
+        SharedPreferences sp= getSharedPreferences(LOCATION_NAME, Context.MODE_PRIVATE);
+        //根据key取出对应的值
+        String location = sp.getString("location", "");
+        String s = DBManager.queryInfoByCity(location);
+        weather = WeatherJson.getWeatherResponse(s);
+
+        // 点击天气桌面组件，进入MainActivity
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(),
                 0, intent, 0);
-        remoteViews.setOnClickPendingIntent(R.id.widget_weather, pi);
+        remoteViews.setOnClickPendingIntent(R.id.widget_ll, pi);
 
-//        //有权限开启定位功能，异步
-//        baiduLocation = new BaiduLocation(getApplicationContext());
-//        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
-//        baiduLocation.registerListener(mListener);
-//        //注册监听
-//        baiduLocation.setLocationOption(baiduLocation.getDefaultLocationClientOption());
-//        baiduLocation.start();
-//        // 设置响应 “按钮(widget_refresh)” 的intent
-//        Intent btIntent = new Intent().setAction(REFRESH_WIDGET);
-//        PendingIntent btPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, btIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        remoteViews.setOnClickPendingIntent(R.id.widget_refresh, btPendingIntent);
+
+        // 设置响应 “按钮(widget_refresh)” 的intent
+        Intent btIntent = new Intent(getApplicationContext(), RefreshReceiver.class)
+                .setAction(REFRESH_WIDGET);
+        PendingIntent btPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0x01, btIntent, 0);//PendingIntent.FLAG_UPDATE_CURRENT
+        remoteViews.setOnClickPendingIntent(R.id.widget_refresh, btPendingIntent);
+
 
         updateTime();// 第一次运行时先更新一下时间和天气
         updateWeather();
@@ -120,6 +139,27 @@ public class UpdateService extends Service {
                 currentPosition.append(location.getLatitude()).append(","); // 经度
                 currentPosition.append(location.getLongitude());// 纬度
                 locationCountyWeatherName = currentPosition.toString();
+                if (isNetworkAvailable()) {
+                    String weatherUrl = "https://api.heweather.net/s6/weather?location=" + locationCountyWeatherName + "&key=88796e0ed0b045c0aba50fd9c2239a35";
+                    MyHttp.sendRequestOkHttpForGet(weatherUrl, new MyCallBack() {
+                        @Override
+                        public void onFailure(IOException e) {
+                            LogUtil.d(TAG, "onFailure: netWork error");
+                        }
+
+                        @Override
+                        public void onResponse(String response) throws IOException {
+                            final String responseText = response;
+                            LogUtil.d(TAG, "onResponse: responseText: " + responseText);
+                            weather = WeatherJson.getWeatherResponse(responseText);
+                            updateTime();
+                            updateWeather();
+                            hideLoading();
+                        }
+                    });
+                } else {
+                    toast();
+                }
             }
         }
     };
@@ -143,24 +183,6 @@ public class UpdateService extends Service {
 
 
     private void updateWeather() {
-//        if (isNetworkAvailable()) {
-//            String weatherUrl = "https://api.heweather.net/s6/weather?location=" + locationCountyWeatherName + "&key=88796e0ed0b045c0aba50fd9c2239a35";
-//            MyHttp.sendRequestOkHttpForGet(weatherUrl, new MyCallBack() {
-//                @Override
-//                public void onFailure(IOException e) {
-//                    LogUtil.d(TAG, "onFailure: netWork error");
-//                }
-//
-//                @Override
-//                public void onResponse(String response) throws IOException {
-//                    final String responseText = response;
-//                    LogUtil.d(TAG, "onResponse: responseText: " + responseText);
-//                    weather = WeatherJson.getWeatherResponse(responseText);
-//                }
-//            });
-//        } else {
-//            toast();
-//        }
         remoteViews.setTextViewText(R.id.widget_county, weather.basic.countyName);
         String weatherInfoCode = weather.now.code;
         int weatherInfoImageId = IconUtil.getDayIcon(weatherInfoCode);
@@ -173,6 +195,24 @@ public class UpdateService extends Service {
         AppWidgetManager.getInstance(getApplicationContext()).updateAppWidget(
                 componentName, remoteViews);
     }
+
+    class RefreshReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context,Intent intent){
+            showLoading();
+            String action = intent.getAction();
+            if (action.equals(REFRESH_WIDGET)) {
+                //有权限开启定位功能，异步
+                baiduLocation = new BaiduLocation(getApplicationContext());
+                //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+                baiduLocation.registerListener(mListener);
+                //注册监听
+                baiduLocation.setLocationOption(baiduLocation.getDefaultLocationClientOption());
+                baiduLocation.start();
+            }
+        }
+    }
+
 
     @Override
     public void onStart(Intent intent, int startId) {
@@ -227,5 +267,23 @@ public class UpdateService extends Service {
                                 startActivity(intent);
                             }
                         }).setNegativeButton("取消", null).create().show();
+    }
+
+
+    /**
+     * 显示加载loading
+     *
+     */
+    private void showLoading() {
+        remoteViews.setViewVisibility(R.id.widget_toast, View.VISIBLE);
+        remoteViews.setViewVisibility(R.id.widget_refresh, View.GONE);
+    }
+
+    /**
+     * 隐藏加载loading
+     */
+    private void hideLoading() {
+        remoteViews.setViewVisibility(R.id.widget_toast, View.GONE);
+        remoteViews.setViewVisibility(R.id.widget_refresh, View.VISIBLE);
     }
 }

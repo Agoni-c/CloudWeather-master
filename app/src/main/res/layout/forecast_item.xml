@@ -114,7 +114,7 @@
 
         </LinearLayout>
 
-        <com.example.cyk.cloudweather.WeatherChartView
+        <com.example.cyk.cloudweather.weather.WeatherChartView
             android:id="@+id/line_char"
             android:layout_width="match_parent"
             android:layout_height="120dp"

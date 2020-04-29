@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.cyk.cloudweather.R;
+import com.example.cyk.cloudweather.bean.HeadlineNewsBean;
 import com.example.cyk.cloudweather.bean.NewsBean;
 import com.example.cyk.cloudweather.util.ResolutionUtil;
 import com.squareup.picasso.Picasso;
@@ -18,12 +18,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ItemNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<NewsBean.Bean> objects = new ArrayList<NewsBean.Bean>();
+    private List<NewsBean> objects = new ArrayList<NewsBean>();
 
     private Context context;
 
@@ -31,11 +30,11 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.context = context;
     }
 
-    public void setData(List<NewsBean.Bean> objects) {
+    public void setData(List<NewsBean> objects) {
         this.objects = objects;
     }
 
-    public void addData(List<NewsBean.Bean> newObjects) {
+    public void addData(List<NewsBean> newObjects) {
         objects.addAll(newObjects);
     }
 
@@ -48,6 +47,14 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    /**
+     * @param parent:ViewGroup是将保存您要创建的单元格的父级视图。因此，ViewGroup父级是此处的RecyclerView（它将保存您的单元格）。
+     *              在布局膨胀过程中使用了父对象，因此您可以看到它传递给膨胀调用。
+     * @param viewType:如果列表中的单元格类型不同，则viewType很有用。例如，如果您具有标题单元格和详细信息单元格。您可以使用viewType
+     *                来确保为这两种类型的单元格中的每一个都填充正确的布局文件。
+     *
+     * @return
+     */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == 0) {
@@ -59,59 +66,33 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     .inflate(R.layout.footer, parent, false);
             return new FooterHolder(view);
         }
-
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemNewsHolder) {
-            final NewsBean.Bean bean = objects.get(position);
-            if (bean == null) {
+            final NewsBean data = objects.get(position);
+            if (data == null) {
                 return;
             }
             int widthPixels=context.getResources().getDisplayMetrics().widthPixels;
             int width = widthPixels;
             int height = ResolutionUtil.dipToPx(context, 200);
             Picasso.get()
-                    .load(bean.getImgsrc())
+                    .load(data.getThumbnail_pic_s())
                     .error(R.drawable.img_error)
                     .resize(width,height)
                     .placeholder(R.drawable.loads)
                     .centerCrop()
                     .into(((ItemNewsHolder) holder).ivNewsImg);
-//            Glide.with(context)
-//                    .load(bean.getImgsrc())
-//                    .error(R.drawable.img_error)
-//                    .placeholder(R.drawable.loads)
-//                    .override(width,height)
-//                    .centerCrop()
-//                    .into(((ItemNewsHolder) holder).ivNewsImg);
-
-//            if (position == 0) {
-//                ((ItemNewsHolder) holder).tvNewsDigest.setVisibility(View.GONE);
-//                ((ItemNewsHolder) holder).tvNewsTitle.setText("图片：" + bean.getTitle());
-//            } else {
-//                ((ItemNewsHolder) holder).tvNewsTitle.setText(bean.getTitle());
-//                ((ItemNewsHolder) holder).tvNewsDigest.setText(bean.getMtime() + " : " + bean.getDigest());
-//                ((ItemNewsHolder) holder).cvNews.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(context, NewDetailActivity.class);
-//                        intent.putExtra("url", bean.getUrl());
-//                        intent.putExtra("title", bean.getSource());
-//                        context.startActivity(intent);
-//                    }
-//                });
-//            }
-
-            ((ItemNewsHolder) holder).tvNewsTitle.setText(bean.getTitle());
-            ((ItemNewsHolder) holder).tvNewsSource.setText(bean.getSource());
+            ((ItemNewsHolder) holder).tvNewsTitle.setText(data.getTitle());
+            ((ItemNewsHolder) holder).tvNewsSource.setText(data.getAuthor_name());
             ((ItemNewsHolder) holder).recylerview_ll.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, NewDetailActivity.class);
-                    intent.putExtra("url", bean.getUrl());
-                    intent.putExtra("title", bean.getTitle());
+                    intent.putExtra("url", data.getUrl());
+                    intent.putExtra("title", data.getTitle());
                     context.startActivity(intent);
                 }
             });
@@ -132,18 +113,12 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     protected class ItemNewsHolder extends RecyclerView.ViewHolder {
         private ImageView ivNewsImg;
         private TextView tvNewsTitle;
-        private TextView tvNewsDigest;
         private TextView tvNewsSource;
         private TextView tvNewsTime;
-        private CardView cvNews;
         private LinearLayout recylerview_ll;
 
         public ItemNewsHolder(View view) {
             super(view);
-//            ivNewsImg = (ImageView) view.findViewById(R.id.iv_news_img);
-//            tvNewsTitle = (TextView) view.findViewById(R.id.tv_news_title);
-//            tvNewsDigest = (TextView) view.findViewById(R.id.tv_news_digest);
-//            cvNews = (CardView) view.findViewById(R.id.cv_news);
 
             ivNewsImg = (ImageView) view.findViewById(R.id.news_img);
             tvNewsTitle = (TextView) view.findViewById(R.id.news_title);

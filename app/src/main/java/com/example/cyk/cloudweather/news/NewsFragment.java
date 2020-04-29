@@ -2,10 +2,10 @@ package com.example.cyk.cloudweather.news;
 
 
 import android.os.Bundle;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.cyk.cloudweather.R;
 import com.google.android.material.tabs.TabLayout;
 
@@ -19,11 +19,11 @@ import androidx.viewpager.widget.ViewPager;
  * A simple {@link Fragment} subclass.
  */
 public class NewsFragment extends Fragment {
-
-    public static final int NEWS_TYPE_TOP=0;
-    public static final int NEWS_TYPE_CAR = 1;
-    public static final int NEWS_TYPE_NBA = 2;
-    public static final int NEWS_TYPE_JOKES = 3;
+    //新闻类型
+    public static final String NEWS_TYPE_TOP = "top";
+    public static final String NEWS_TYPE_YULE = "yule";
+    public static final String NEWS_TYPE_KEJI = "keji";
+    public static final String NEWS_TYPE_TIYU= "tiyu";
     private List<Fragment> fragments = new ArrayList<>();
     private List<String> fragmentTitles = new ArrayList<>();
     private TabLayout tl_news;
@@ -48,13 +48,13 @@ public class NewsFragment extends Fragment {
 
     private void setViewPager() {
         fragments.add(NewsListFragment.newInstance(NEWS_TYPE_TOP));
-        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_CAR));
-        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_NBA));
-        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_JOKES));
+        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_YULE));
+        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_KEJI));
+        fragments.add(NewsListFragment.newInstance(NEWS_TYPE_TIYU));
         fragmentTitles.add("头条");
-        fragmentTitles.add("汽车");
+        fragmentTitles.add("娱乐");
+        fragmentTitles.add("科技");
         fragmentTitles.add("体育");
-        fragmentTitles.add("笑话");
         MyFragmentAdapter adapter=new MyFragmentAdapter(getChildFragmentManager(),
                 fragments,fragmentTitles);
         vp_news.setAdapter(adapter);

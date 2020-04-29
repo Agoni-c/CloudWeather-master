@@ -8,6 +8,7 @@ import android.view.WindowManager;
 
 import com.example.cyk.cloudweather.news.NewsFragment;
 import com.example.cyk.cloudweather.video.VideoFragment;
+import com.example.cyk.cloudweather.weather.WeatherFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -145,4 +146,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+
+    }
 }

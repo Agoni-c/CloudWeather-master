@@ -27,6 +27,14 @@ public class Forecast {
     @SerializedName("cond_txt_n")
     public String cond_txt_n;
 
+    //日出时间
+    @SerializedName("sr")
+    public String sr;
+
+    //日落时间
+    @SerializedName("ss")
+    public String ss;
+
     //最高温度
     @SerializedName("tmp_max")
     public String max;

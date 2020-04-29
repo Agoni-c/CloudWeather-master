@@ -3,11 +3,11 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="400dp"
+    android:id="@+id/now_ll"
     android:gravity="center">
 
     <ImageView
         android:id="@+id/weather_info_image"
-        android:src="@mipmap/bg"
         android:layout_gravity="center"
         android:layout_width="96dp"
         android:layout_height="96dp" />
@@ -21,7 +21,6 @@
             android:id="@+id/weather_info_text"
             android:textColor="#fff"
             android:textSize="20sp"
-            android:text="多云 | "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -30,7 +29,6 @@
             android:textColor="#fff"
             android:textSize="20sp"
             android:layout_toRightOf="@id/weather_info_text"
-            android:text="西风三级 | "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -39,7 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/weather_wind"
-            android:text="空气质量优"
             android:textColor="#fff"
             android:textSize="20sp" />
 
@@ -52,11 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="#fff"
-        android:text="33℃"
         android:textSize="60sp"/>
 
     <TextView
-        android:text="10:29"
         android:id="@+id/title_update_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,14 +72,6 @@
             android:src="@mipmap/mapbg"
             android:layout_gravity="right"
             android:visibility="visible"
-            />
-        <ImageView
-            android:id="@+id/weather_normal"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@mipmap/weatherbg"
-            android:layout_gravity="right"
-            android:visibility="gone"
             />
 
     </RelativeLayout>

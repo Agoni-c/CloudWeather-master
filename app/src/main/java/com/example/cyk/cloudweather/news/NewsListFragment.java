@@ -9,10 +9,19 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.cyk.cloudweather.R;
-import com.example.cyk.cloudweather.bean.NewsBean;
-import com.example.cyk.cloudweather.news.presenter.NewsPresenter;
-import com.example.cyk.cloudweather.news.view.INewsView;
+import com.example.cyk.cloudweather.bean.HeadlineNewsBean;
 
+import com.example.cyk.cloudweather.bean.NewsBean;
+import com.example.cyk.cloudweather.json.NewsJson;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 
 import androidx.fragment.app.Fragment;
@@ -23,21 +32,20 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 /**
  * create an instance of this fragment.
  */
-public class NewsListFragment extends Fragment implements INewsView {
+public class NewsListFragment extends Fragment {
     private static final String TAG = "NewsListFragment";
-    private NewsPresenter presenter;
-    private int type;
+    private String type;
     private SwipeRefreshLayout srl_news;
     private RecyclerView rv_news;
     private ItemNewsAdapter adapter;
-    private List<NewsBean.Bean> newsBeanList;
+    private HeadlineNewsBean headlineNewsBean;
+    private List<NewsBean> newsBeanList;
     private LinearLayoutManager layoutManager;
-    private int startPage = 0;
 
-    public static NewsListFragment newInstance(int type) {
+    public static NewsListFragment newInstance(String type) {
         Bundle args = new Bundle();
         NewsListFragment fragment = new NewsListFragment();
-        args.putInt("type", type);
+        args.putString("type", type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +59,7 @@ public class NewsListFragment extends Fragment implements INewsView {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        type = getArguments().getInt("type");
+        type = getArguments().getString("type");
         rv_news = view.findViewById(R.id.rv_news);
         adapter = new ItemNewsAdapter(this.getActivity());
         srl_news = view.findViewById(R.id.srl_news);
@@ -59,10 +67,10 @@ public class NewsListFragment extends Fragment implements INewsView {
         srl_news.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenter.loadNews(type, 0);
+                loadNews(type);
+                srl_news.setRefreshing(false);
             }
         });
-        presenter = new NewsPresenter(this);
         Log.i(TAG, "onViewCreated: "+type);
         rv_news.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -76,76 +84,95 @@ public class NewsListFragment extends Fragment implements INewsView {
         initData();
     }
 
-    private void initData() {
-        presenter.loadNews(type, 0);
-    }
-
-    private void loadMore() {
-        startPage += 20;
-        presenter.loadNews(type, startPage);
-    }
-
-    @Override
-    public void showNews(final NewsBean newsBean) {
+    private void loadNews(String type){
         switch (type) {
             case NewsFragment.NEWS_TYPE_TOP:
-                newsBeanList = newsBean.getTop();
+                requestNews(NewsFragment.NEWS_TYPE_TOP);
+                showNews();
                 break;
-            case NewsFragment.NEWS_TYPE_CAR:
-                newsBeanList = newsBean.getCar();
+            case NewsFragment.NEWS_TYPE_YULE:
+                requestNews(NewsFragment.NEWS_TYPE_YULE);
+                showNews();
                 break;
-            case NewsFragment.NEWS_TYPE_JOKES:
-                newsBeanList = newsBean.getJoke();
+            case NewsFragment.NEWS_TYPE_KEJI:
+                requestNews(NewsFragment.NEWS_TYPE_KEJI);
+                showNews();
                 break;
-            case NewsFragment.NEWS_TYPE_NBA:
-                newsBeanList = newsBean.getNba();
+            case NewsFragment.NEWS_TYPE_TIYU:
+                requestNews(NewsFragment.NEWS_TYPE_TIYU);
+                showNews();
                 break;
         }
+    }
+
+    /**
+     * 根据新闻类型请求新闻数据
+     */
+    public void requestNews(final String type){
+        String newsUrl = "http://v.juhe.cn/toutiao/index?type="+type+"&key=a7722eda2d2f5d1e84b223ef96197175";
+
+            try {
+                URL url = new URL(newsUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(5000);
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(5000);
+                InputStream in = connection.getInputStream();
+                String response = convertStreamToString(in);
+                headlineNewsBean = NewsJson.getNewsResponse(response);
+                newsBeanList = headlineNewsBean.newsBeanList;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    public static String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
+
+    public void showNews() {
         Log.i("list", "showNews: " + newsBeanList.size());
         adapter.setData(newsBeanList);
         layoutManager = new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.VERTICAL, false);
         rv_news.setLayoutManager(layoutManager);
         rv_news.setAdapter(adapter);
-
-
     }
 
-    @Override
-    public void showMoreNews(NewsBean newsBean) {
-        switch (type) {
-            case NewsFragment.NEWS_TYPE_TOP:
-                adapter.addData(newsBean.getTop());
-                break;
-            case NewsFragment.NEWS_TYPE_CAR:
-                adapter.addData(newsBean.getCar());
-                break;
-            case NewsFragment.NEWS_TYPE_JOKES:
-                adapter.addData(newsBean.getJoke());
-                break;
-            case NewsFragment.NEWS_TYPE_NBA:
-                adapter.addData(newsBean.getNba());
-                break;
-        }
+    private void initData() {
+        loadNews(type);
+    }
 
+    private void loadMore() {
+        loadNews(type);
+        showMoreNews();
+    }
+
+
+    public void showMoreNews() {
+        adapter.addData(newsBeanList);
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void hideDialog() {
-        srl_news.setRefreshing(false);
-    }
-
-    @Override
-    public void showDialog() {
-        srl_news.setRefreshing(true);
-    }
-
-    @Override
-    public void showErrorMsg(Throwable throwable) {
-
-        adapter.notifyItemRemoved(adapter.getItemCount());
-
-        Toast.makeText(getContext(), "加载出错:" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-    }
 }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white_trans10"
+    tools:context=".weather.SettingActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/alarm_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:src="@mipmap/left_arrow"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="预警信息"
+            android:textColor="@color/black_trans70"
+            android:textSize="20dp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/alarm_tv"
+        android:layout_marginTop="80dp"
+        android:layout_marginBottom="50dp"
+        android:text="-雷电黄色预警-"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:textColor="@color/black_trans70"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/alarm_content"
+        android:layout_margin="30dp"
+        android:text="泉州市气象台2020年04月03日10时53分继续发布雷电黄色预警信号：预计未来6小时我市山区部分乡镇有雷电活动，局部伴有短时强降水，请注意防范！"
+        android:textSize="16dp"
+        android:lineSpacingExtra="15dp"
+        android:textColor="@color/black_trans70"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_gravity="center_horizontal"
+        android:gravity="bottom"
+        android:layout_marginBottom="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/alarm_logo"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/logo"/>
+        <TextView
+            android:layout_toRightOf="@+id/alarm_logo"
+            android:text="云烟成雨"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</LinearLayout>

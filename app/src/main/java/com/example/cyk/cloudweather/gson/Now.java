@@ -30,4 +30,4 @@ public class Now {
     @SerializedName("wind_sc")
     public String wind_strength;//风力
 
- }
+}
